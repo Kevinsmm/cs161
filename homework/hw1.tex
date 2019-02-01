@@ -1,0 +1,358 @@
+\documentclass[12pt]{exam}
+\usepackage[homework,id=1]{cs161}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{pdfpages}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{subfiles}
+\usepackage{etoolbox}
+
+\lstset{
+language=C,                % choose the language of the code
+basicstyle=\scriptsize,       % the size of the fonts that are used for the code
+numbers=left,                   % where to put the line-numbers
+numberstyle=\scriptsize,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,           % adds a frame around the code
+tabsize=2,          % sets default tabsize to 2 spaces
+captionpos=b,           % sets the caption-position to bottom
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
+
+\newcommand{\solbox}[2]{%
+\fbox{%
+\parbox[c][#1][t]{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{
+  \hrule width \hsize height 0pt
+  #2
+ }%
+}%
+\par\vspace{\ht\strutbox}
+}
+\makeatother
+
+\usepackage{etoolbox}
+\newtoggle{pdfform}
+\togglefalse{pdfform} % may be toggled true in configuration
+
+\InputIfFileExists{config}{}
+
+\newcommand{\textfield}[3]{%
+\iftoggle{pdfform}{%
+\TextField[name = #1, backgroundcolor=white, height=#2,
+width = \linewidth, multiline=true]{\mbox}%
+}{%
+\ifprintanswers\else{%
+    \solbox{#2}{#3}}
+\fi%
+}%
+}
+
+\newcommand{\includesolution}[1]{%
+\IfFileExists{solutions/#1.tex}{%
+\begin{solution}%
+\subfile{solutions/#1.tex}%
+\end{solution}%
+}{}
+}
+
+\newcommand{\checkbox}[3]{%
+\ifprintanswers\else%
+\CheckBox[name = #1, checked = #3, backgroundcolor=white, bordercolor=black, #2]{}%
+\fi%
+}
+
+\def\duedate{Tuesday, 5 February 2019}
+
+\begin{document}
+\begin{Form}
+
+\begin{center}
+  \large
+  Due: \duedate, at 11:59pm
+\end{center}
+
+\paragraph{Instructions.}
+This homework is due on \textbf{\duedate, at 11:59pm}. No late homeworks will be accepted unless you have prior accomodations from us.
+This assignment must be done on your own.
+
+Create an EECS instructional class account if you have not already. To do so,
+visit \url{https://inst.eecs.berkeley.edu/webacct/}, click ``Login
+using your Berkeley CalNet ID,'' then find the cs161 row and click ``Get a new
+account.'' Be sure to take note of the account login and password, and log in to
+your instructional account.
+
+Make sure you have a Gradescope account and are joined in this course.  The
+homework \emph{must} be submitted electronically via Gradescope (not by
+any other method).  Your answer for each question,
+when submitted on Gradescope, should be a
+single file with each question's answer on a separate page.
+
+\begin{questions}
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%QUESTION 1%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\titledquestion{Policy}[10]
+
+The aim of this exercise is to ensure that you read the course policies, as
+well as to make sure that you are registered in the class and have a working
+EECS instructional class account.
+
+Open the course website \url{http://inst.eecs.berkeley.edu/~cs161/sp19/}.
+
+Read the course policies and answer the following question:
+
+How many project ``slip days'' do you get?
+
+\textfield{Q1}{0.5cm}{
+%Your solution to Q1 here
+    0
+}
+
+\vspace{0.12em}
+
+\includesolution{sol1}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%QUESTION 2%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\titledquestion{Collaboration}[10]
+
+You're working on a course project.
+Your code isn't working, and you can't figure out why not.
+Is it OK to show another student (who is not your project partner) your
+draft code and ask them if they have any idea why your code is broken
+or any suggestions for how to debug it?\\\\
+Select if yes \checkbox{Q2Y}{}{
+%Yes/No directions: change this argument to 'true' to check the box
+%Alternatively, export and check the box using a pdf editor
+false}
+
+
+\includesolution{sol2}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%QUESTION 3%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\titledquestion{Security Principles}[20]
+For each of the following paragraphs, there is exactly one security principle that best applies to the situation described. Select the best \textbf{four options} from below after reading the following scenario:
+
+Getting on the cryptocurrency hype, one day Bob decides to set up his own exchange. He
+sets up all the infrastructure, but worries about forgetting the password, so Bob hides
+his login credentials in an HTML comment on the login page.
+
+Eventually, Bob manages to gather a large user-base and realizes his site looks like a
+back-end developer trying to learn CSS, so he contracts out front-end work to Mallory's
+Do-No-Evil design firm (for an incredible price too!). He gives them an account with access
+to his front-end and back-end codebase, and databases of user information as well.
+
+Finally, Bob wants to enforce password security. Bob requires every user to use a "super-secure" 
+password; that is, the password cannot contain any English word, cannot contain any birthday, and 
+must have many special characters (e.g., \$ \%). The user needs to type in this password every 5 minutes. 
+Bob disables the clipboard on the password field; in this way, the user must manually enter the password, nothing else. 
+
+Unfortunately for him, one day he wakes up to his website being
+featured on a well-known news site after a data leak. Pressured by an
+internet mob, he hires a contractor to find all the issues with his
+site. However, fixing the website ended up being a different story,
+as much of the code was written (uncommented) in a late-night
+coffee-fuled frenzy, and Bob finds that he can't change any aspect of
+the website without breaking it in its entirety.  In a panic, Bob
+announced the closure of his site and goes into hiding.
+
+\begin{tabular}{m{12cm} m{3.5cm}}
+1. Does Bob violate \textbf{security is economics}?
+& Select if yes \checkbox{Q2P1Y}{width=1.5em}{
+%Yes/No directions: change this argument to 'true' to check the box
+%Alternatively, export and check the box using a pdf editor
+false}\\\\
+
+2. Does Bob violate \textbf{least privilege}?
+& Select if yes \checkbox{Q3P2Y}{width=1.5em}{true}\\\\
+
+3. Does Bob violate \textbf{fail-safe defaults}?
+& Select if yes \checkbox{Q3P3Y}{width=1.5em}{false}\\\\
+
+4. Does Bob violate \textbf{separation of responsibility}?
+& Select if yes \checkbox{Q3P4Y}{width=1.5em}{false}\\\\
+
+5. Does Bob violate \textbf{don't rely on security by obscurity}?
+& Select if yes \checkbox{Q3P5Y}{width=1.5em}{true}\\\\
+
+6. Does Bob violate \textbf{consider human factors}?
+& Select if yes \checkbox{Q3P6Y}{width=1.5em}{true}\\\\
+
+7. Does Bob violate \textbf{complete mediation}?
+& Select if yes \checkbox{Q3P7Y}{width=1.5em}{false}\\\\
+
+8. Does Bob violate \textbf{detect if you can't protect}?
+& Select if yes \checkbox{Q3P8Y}{width=1.5em}{false}\\\\
+
+9. Does Bob violate \textbf{design security in from the start}?
+& Select if yes \checkbox{Q3P9Y}{width=1.5em}{true}\\\\
+
+\end{tabular}
+\includesolution{sol3}
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%QUESTION 4%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\titledquestion{Vulnerable Code}[40]
+Consider the following C code:
+\begin{lstlisting}
+void greet(char *arg)
+{
+  char buffer[12];
+  printf(``I am the Senate. What is your name?\n");
+  scanf(``%s", buffer);
+  printf(``It's treason then, %s\n", buffer);
+}
+
+int main(int argc, char *argv[])
+{
+  char beg[3] = `Obi';
+  char end[11] = `Wan Kenobi?';
+  strncat(beg, end, 5);
+  greet(argv[1]);
+  return 0;
+}
+\end{lstlisting}
+
+\begin{enumerate}
+  \item What is the line number that has a memory vulnerability? \\
+\textfield{Q4P1}{0.5cm}{
+%Your solution to Q4 part 1 here
+    5
+}
+  \item What is this vulnerability called?\\
+\textfield{Q4P2}{0.5cm}{
+%Your solution to Q4 part 2 here
+    buffer overflow attack
+}
+  \item Just before the program executes the line in part 1, the registers are:
+    \begin{center}
+      \texttt{\%esp: 0xBFFFF820}
+      \hspace{2cm}
+      \texttt{\%ebp: 0xBFFFF848}
+    \end{center}
+    Given this information, describe in detail how an attacker would take advantage of the vulnerability.
+    Also make sure to include the address that the attacker needs to over-write. (Maximum 5 sentences)\\
+\textfield{Q4P3}{3cm}{
+%Your solution to Q4 part 3 here
+    The most simple exploit is code injection. The attacker should input more than 12 characters (I can't determine the exact number because of memory alignment issue) and overwrite the function return address area. The address that the attacker need to overwrite is 0xbffff820. By the way, the attacker can printf any stack data as he want.
+}
+  \item What would you change to fix the problem in part 1?\\
+\textfield{Q4P4}{0.5cm}{
+%Your solution to Q4 part 4 here
+    Please use C++ std::getline rather than unsafe scanf. An example written by me is here: https://github.com/recolic/rlib/blob/3a442c6dd8661d45cfe7528112b93c42ffa5d591/stdio.hpp#L52
+    
+    If I must figure out the implementation of std::getline, please read here: https://github.com/recolic/rlib/blob/3a442c6dd8661d45cfe7528112b93c42ffa5d591/sys/sio.hpp#L516
+}
+  \item Given the code as is, would stack canaries prevent exploitation of this vulnerability?\\
+      Select if yes \checkbox{Q4P5Y}{}{
+      %Yes/No directions: change this argument to 'true' to check the box
+      %Alternatively, export and check the box using a pdf editor
+      false}\\
+    Why or why not?\\
+\textfield{Q4P5}{1cm}{
+%Your solution to Q4 part 5 here
+    Stack canaries can make the exploit harder, but it won't prevent the exploitation. The attacker can still printf data on stack. However, canaries are still very very useful to protect this program. I considered for some time and answer "no".
+}
+\end{enumerate}
+\includesolution{sol4}
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%QUESTION 5%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\titledquestion{Reasoning About Memory Safety}[35]
+
+Consider the following C code.
+
+\begin{lstlisting}
+/* (a) Precondition: ____________________ */
+void dectohex(uint32_t decimal, char* hex) {
+    char tmp[9];
+    int digit, j = 0, k = 0;
+    do {
+        digit = decimal % 16;
+        if (digit < 10) {
+            digit += '0';
+        } else {
+            digit += 'A' - 10;
+        }
+        /* (b) Invariant: _______________ */
+        tmp[j++] = digit;
+        decimal /= 16;
+    } while (decimal > 0);
+    while (j > 0) {
+        hex[k++] = tmp[--j];
+        /* (c) Invariant: _______________ */
+    }
+    hex[k] = '\0';
+}
+\end{lstlisting}
+
+\begin{enumerate}
+\item Please identify the \textbf{preconditions} that must hold true for the following code to be memory safe. In addition, the precondition must be as conservative as possible (e.g. \texttt{decimal} cannot be required to be solely zero). Justify why your given precondition cannot be any less strict.\\
+\textfield{Q5P1}{4.5cm}{
+%Your solution to Q5 part 1 here
+    Argument `hex` must be a valid pointer to a writable memory space, and its size must be at least 9 bytes. 
+
+    If my precondition is not true, one of the following thing happens: 1. The pointer hex is invalid. It will
+        write some random memory address or cause segmentation fault. 2. The buffer size is less than 9 bytes. Now
+        because 32bit unsigned integer has maximum value "0xffffffff", and we have k<=8. 
+}
+\item Please identify the loop \textbf{invariants} (b, c) that must hold true and justify them as well.\\
+\textfield{Q5P2}{4.5cm}{
+%Your solution to Q5 part 2 here
+}
+\end{enumerate}
+\includesolution{sol5}
+
+\newpage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%FEEDBACK%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\titledquestion{Feedback}[0]
+
+Optionally, feel free to include feedback.  What's the single thing we could do
+to make the class better?  Or, what did you find most difficult or confusing from
+lectures or the rest of class, and what would you like to see explained better?
+If you have feedback, submit your comments as your answer to Q{\thequestion}.\\
+\textfield{Feedback}{15cm}{
+%Your feedback here
+}
+\includesolution{feedback}
+
+
+\end{questions}
+\end{Form}
+\end{document}
+

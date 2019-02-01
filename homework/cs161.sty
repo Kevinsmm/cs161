@@ -1,0 +1,419 @@
+%==============================================================================
+%                              CS 161 Style File
+%==============================================================================
+%
+% Document style options:
+%   - midterm
+%   - final
+%   - project
+%   - homework
+%   - section
+%   - notes
+%   - rubric        Can be add to all of the above (except notes) and will add
+%                   an extra Rubric tag in the top right banner and bottom left
+%                   footnote.
+%   - id=ID         The document identifier. Can be a plain number or a date,
+%                   e.g., id=2 or id=1/20.
+%   - duedate=DATE  The date when an assignment is due, 
+%                   e.g., duedate={Friday March 4}
+%   - duetime=TIME  The time when an assignment is due, e.g., duetime=5:00pm.
+%
+% Examples:
+%   \usepackage[section,id=2]{cs161}
+%   \usepackage[notes,id=1/20]{cs161}
+%   \usepackage[homework,id=3,duedate={Friday March 4}]{cs161}
+%   \usepackage[homework,rubric,id=3]{cs161}
+%
+%==============================================================================
+
+\def\fileversion{0.3}
+\def\filedate{2011/03/03}
+\ProvidesPackage{cs161}[%
+\filedate\space Version \fileversion\space by Matthias Vallentin]
+
+\def\instructor{Popa \& Weaver}
+\def\semester{Spring 2019}
+
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{family=,prefix=@}
+\DeclareBoolOption{midterm}
+\DeclareBoolOption{final}
+\DeclareBoolOption{project}
+\DeclareBoolOption{homework}
+\DeclareBoolOption{rubric}
+\DeclareBoolOption{section}
+\DeclareBoolOption{notes}
+\DeclareStringOption{id}
+\DeclareStringOption{duedate}
+\DeclareStringOption{duetime}
+\ProcessKeyvalOptions*
+
+\usepackage{alltt}
+\usepackage{amsmath}
+\usepackage{comment}
+\usepackage{hyperref}
+\usepackage{parskip}
+\usepackage{sectsty}
+\usepackage{xspace}
+
+%\if@duetime
+%\else
+%\def\@duetime{11:59pm}
+%\fi
+
+\def\@doctype{%
+\if@midterm Midterm\fi
+\if@final Final Exam\fi
+\if@project Project\fi
+\if@homework Homework\fi
+\if@section Discussion\fi}
+
+\ifprintanswers
+\else
+\addpoints
+\fi
+
+% Gothic fonts
+\font\dunhd=cmdunh10 scaled \magstep5
+\font\dunhc=cmdunh10 scaled \magstep4
+\font\dunhb=cmdunh10 scaled \magstep3
+\font\dunha=cmdunh10 scaled \magstep2
+\font\dunh=cmdunh10  scaled \magstep1
+\sectionfont{\dunhb}
+\subsectionfont{\dunha}
+\subsubsectionfont{\dunh}
+
+% Header & Footer
+\pagestyle{headandfoot}
+\extraheadheight[1in]{0in}
+\extrafootheight{-.2in}
+\lhead[\dunhb \instructor\\
+       \vspace{5pt}
+       \semester\\
+       \vspace{10pt}]{}
+\rhead[\dunhb \@doctype\xspace\@id\\
+       \if@rubric\vspace{5pt}Rubric\\\vspace{10pt}
+       \else
+       \vspace{20pt}
+       \fi]{}
+\chead[\hrule height 3pt
+       \vspace{10pt}
+       \dunhb CS 161\\
+       \vspace{5pt}
+       Computer Security\\
+       \vspace{10pt}
+       \hrule height 3pt]{}
+
+\if@notes
+\lfoot{\footnotesize \@doctype\xspace\@id}
+\cfoot{\footnotesize
+\semester}
+\rfoot{\footnotesize \thepage\ of \numpages}
+\else
+\lfoot[]{\footnotesize \@doctype\xspace\@id\if@rubric~(Rubric)\fi}
+\cfoot{\footnotesize Page \thepage\ of \numpages}
+\rfoot[]{\footnotesize CS 161 -- \semester}
+\fi
+
+% Question formatting
+\qformat{\bf Problem \thequestion \quad \textit{\thequestiontitle} 
+  \hfill (\totalpoints\ \points)}
+
+\if@section
+\pointname{ min}
+\qformat{\bf Question \thequestion \quad \textit{\thequestiontitle} \hfill
+  (\thepoints)}
+\fi
+
+\if@project
+\qformat{\bf Question \thequestion \quad \textit{\thequestiontitle} \hfill
+  (\thepoints)}
+\fi
+
+% \newcommand{\fillin}[1]{\underline{\hskip #1}}
+% \newcommand{\fillin}{\underline{\hskip 1.5in}}
+
+% Due date/time header.
+\def\due{%
+\begin{center}
+  \large
+  Due: \@duedate, at \@duetime
+\end{center}
+}
+
+% Introductory text after header.
+\if@midterm
+\def\introduction{%
+{\sc Print} your name:
+\begin{tabular}{cc}
+\\
+\fillin,
+&\fillin\\
+{\small (last)}
+&{\small (first)}
+\end{tabular}\\[.1in]
+\emph{I am aware of the Berkeley Campus Code of Student Conduct and acknowledge
+that academic misconduct will be reported to the Center for Student
+Conduct.}\\[.3in]
+{\sc Sign} your name: \fillin\\[.3in]
+{\sc Print} your class account login: \texttt{cs161-}\fillin ~and SID: 
+\fillin\\[.3in]
+%Your TA's name: \fillin{4in}\\[.3in]
+%Your section day \& time: \fillin{4in}\\[.3in]
+\begin{tabular}{@{}l}
+Name of the person\\
+sitting to your left:
+\end{tabular} \fillin
+\hfill
+\begin{tabular}{l}
+Name of the person\\
+sitting to your right:
+\end{tabular} \fillin
+\vskip .3in
+
+You may consult one sheet of paper of notes.
+You may not consult other notes, textbooks, etc.
+Calculators, computers, and other electronic devices are not permitted.
+%Please write your answers in the spaces provided in the test.
+%We will not grade anything elsewhere
+%unless we are clearly told to look there.
+
+If you think a question is ambiguous, please come up to the front of
+the exam room to the staff. If we agree that the question is
+ambiguous we will add clarifying assumptions to the central document
+projected in the exam rooms. Write your student ID on the top of
+every page.
+
+You have 110 minutes. There are \numquestions\ questions, of varying credit
+(\numpoints\ points total). The questions are of varying difficulty, so avoid
+spending too long on any one question.
+
+\vfill
+
+\begin{center}
+\fbox{\fbox{\parbox{5.5in}{\centering
+Do not turn this page until your instructor tells you to do so.
+}}}
+\end{center}
+\vfill
+
+%\begin{center}
+%\gradetable[h][questions]
+%\end{center}
+}
+\fi
+
+\if@final
+\def\introduction{%
+{\sc Print} your name:
+\begin{tabular}{cc}
+\\
+\fillin{},
+&\fillin{}\\
+{\small (last)}
+&{\small (first)}
+\end{tabular}\\[.1in]
+\emph{I am aware of the Berkeley Campus Code of Student Conduct and acknowledge
+that any academic misconduct on this exam will lead to a ``F''-grade for the
+course and that the misconduct will be reported to the Center for Student
+Conduct.}\\[.3in]
+{\sc Sign} your name: \fillin\\[.3in]
+{\sc Print} your class account login: \texttt{cs161-}\fillin and SID: 
+~\fillin\\[.3in]
+%Your TA's name: \fillin{4in}\\[.3in]
+% Your section time: \fillin{4in}\\[.3in]
+\begin{tabular}{@{}l}
+Name of the person\\
+sitting to your left:
+\end{tabular} \fillin{}
+\hfill
+\begin{tabular}{l}
+Name of the person\\
+sitting to your right:
+\end{tabular} \fillin{}
+\vskip .3in
+
+Please read the following before starting the exam.
+
+\begin{itemize}
+
+    \item You may consult three double-sided sheets of notes (or six single-sided sheets).
+
+    \item You may not consult other notes, textbooks, \&c. Calculators,
+        computers and other electronic devices are not permitted without prior
+        accomodation.
+
+    \item Please write your answers in the spaces provided in the test. We will
+        not grade anything on the back of an exam page unless we are clearly
+        told to look there.
+
+    \item Before you turn in your exam, write your Student ID at the
+        top of every page.
+
+    \item Bubble every item completely! Avoid using checkmarks, Xs, writing
+        answers on the side, \&c. If you want to unselect an option, erase it
+        completely and clearly.
+
+    \item For questions with circular bubbles, you may select only one choice.
+
+        \subitem \coloredbubble[none]{} Unselected option (completely unfilled)
+
+        \subitem \coloredbubble[black]{} Only one selected option (completely filled)
+
+    \item For questions with square checkboxes, you may select any number of
+        choices (including none or all).
+
+        \subitem \coloredselect[black]{} You can select
+
+        \subitem \coloredselect[black]{} multiple squares (completely filled).
+
+    \item We reserve the right to deduct points from exams which do not follow
+        the above directions. (Of course, we will make reasonable exceptions.)
+
+    \item You have 170 minutes. There are \numquestions\ questions, of varying
+        credit (\numpoints\ points total). The questions are of varying
+        difficulty, so avoid spending too long on any one question.
+
+\end{itemize}
+
+\vfill
+
+\begin{center}
+\fbox{\fbox{\parbox{5.5in}{\centering
+Do not turn this page until your instructor tells you to do so.
+}}}
+\end{center}
+\vfill
+
+%\begin{center}
+%\gradetable[h][questions]
+%\end{center}
+}
+\fi
+
+\if@homework 
+\ifprintanswers
+\else
+\def\introduction{%
+\due
+
+\paragraph{Instructions.}
+Submit your solution by \@duedate, at \@duetime, in the drop box labelled CS
+161 in 283 Soda Hall. Print your name, your class account name (e.g.,
+\texttt{cs161-xy}), your TA's name, the discussion section time where you want
+to pick up your graded homework, and ``HW\@id'' prominently on the first
+page. Staple all pages together. Your solutions must be legible and the
+solution to each problem must be labelled clearly.  You must work on your own
+on this homework.
+}
+\fi
+\fi
+
+\if@homework 
+\ifprintanswers
+\else
+\def\introductionB{%
+\due
+
+\paragraph{Instructions.}
+Submit your solution electronically \emph{via your class account}
+by \@duedate, at \@duetime.  You should upload a single file,
+\texttt{HW\@id.pdf}.
+Your writeup should include
+your name, your class account name (e.g.,
+\texttt{cs161-xy}), your TA's name, the discussion section time where you want
+to pick up your graded homework, and ``HW\@id'' prominently on the first
+page.  Use a legible font and clearly label each solution with the
+problem/subproblem to which it belongs.  You \emph{must} submit a PDF file;
+we will not accept other formats.
+
+You must work on your own on this homework.
+}
+\fi
+\fi
+
+\if@homework 
+\ifprintanswers
+\else
+\def\introductionCtext{%
+\paragraph{Instructions.}
+Submit your solution electronically \emph{via your class account}
+by \@duedate, at \@duetime.  You should upload a single file,
+\texttt{HW\@id.pdf}.
+Your writeup should include
+your name, your class account name (e.g.,
+\texttt{cs161-xy}), your TA's name, your discussion section,
+members of your study group (if any; \textbf{see below}),
+and ``HW\@id'' prominently on the first
+page.  Use a legible font and clearly label each solution with the
+problem/subproblem to which it belongs.  You \emph{must} submit a PDF file;
+we will not accept other formats.
+
+You can work on this homework in study groups of up to
+four people; however, you \textbf{must} write up the solutions
+\emph{on your own}. You
+must never read or copy the solutions of other students (or from online
+materials), or co-develop writeups, and you must
+not share your own solutions with other students.  You must explicitly
+acknowledge everyone who you worked with or who has given you any
+significant ideas about the homework.
+% Similarly, you may use books or
+% online resources to help solve homework problems, but you must always
+% credit all such sources in your writeup and you must never copy
+% material verbatim.
+}
+\def\introductionC{%
+\due
+
+\introductionCtext
+}
+\fi
+\fi
+
+\if@section
+\def\introduction{%
+\ifprintanswers
+\else
+\paragraph{Instructions.}
+We will break into groups to discuss the following questions. Please think of
+as many solutions as you can. Be original! Maybe you will come up with
+something no one has thought of yet. Be prepared to talk about your solutions
+with the rest of the section.
+\fi
+}
+\fi
+
+%==============================================================================
+
+% Link style (hyperref package)
+\hypersetup{
+    breaklinks=true,        % break URLs at the end of line
+    colorlinks=true,        % false: boxed links; true: colored links
+    linkcolor=blue,         % color of internal links
+    citecolor=cyan,         % color of links to bibliography
+    filecolor=red,          % color of file links
+    urlcolor=blue           % color of external links
+}
+
+% General helpers
+\def\hint{\textsc{Hint}: }
+\def\note{\textsc{Note}: }
+\def\first{\emph{(i)}\xspace}
+\def\second{\emph{(ii)}\xspace}
+\def\third{\emph{(iii)}\xspace}
+\newcommand{\alert}[1]{{\textcolor{red}{#1}}}
+\newcommand{\todo}[1]{\textit{\textcolor{red}{TODO: #1}}}
+\newcommand{\chat}[2]{{\textcolor{red}{\textsc{#1}: \textit{#2}}}}
+
+% Requires TikZ.
+%\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+%  \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+% Referencing
+\newcommand{\pref}[1]{part~(\ref{#1})}
+\newcommand{\qref}[1]{\if@section{Question}\else{Problem}\fi~\ref{#1}}
+\newcommand{\qqref}[2]{\qref{#1}\ref{#2}}
+\newcommand{\xref}[1]{\S\ref{#1}}
+\newcommand{\fref}[1]{Figure~\ref{#1}}
+\newcommand{\tref}[1]{Table~\ref{#1}}
+\newcommand{\see}[1]{~(see \xref{#1})}
