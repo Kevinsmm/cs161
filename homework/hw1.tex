@@ -178,39 +178,55 @@ announced the closure of his site and goes into hiding.
 \begin{tabular}{m{12cm} m{3.5cm}}
 1. Does Bob violate \textbf{security is economics}?
 & Select if yes \checkbox{Q2P1Y}{width=1.5em}{
-%Yes/No directions: change this argument to 'true' to check the box
-%Alternatively, export and check the box using a pdf editor
-false}\\\\
+%Yes/No directions: uncomment 'X' to make it appear
+X
+}\\\\
 
 2. Does Bob violate \textbf{least privilege}?
-& Select if yes \checkbox{Q3P2Y}{width=1.5em}{true}\\\\
+& Select if yes \checkbox{Q3P2Y}{width=1.5em}{
+%X
+}\\\\
 
 3. Does Bob violate \textbf{fail-safe defaults}?
-& Select if yes \checkbox{Q3P3Y}{width=1.5em}{false}\\\\
+& Select if yes \checkbox{Q3P3Y}{width=1.5em}{
+X
+}\\\\
 
 4. Does Bob violate \textbf{separation of responsibility}?
-& Select if yes \checkbox{Q3P4Y}{width=1.5em}{false}\\\\
+& Select if yes \checkbox{Q3P4Y}{width=1.5em}{
+X
+}\\\\
 
 5. Does Bob violate \textbf{don't rely on security by obscurity}?
-& Select if yes \checkbox{Q3P5Y}{width=1.5em}{true}\\\\
+& Select if yes \checkbox{Q3P5Y}{width=1.5em}{
+%X
+}\\\\
 
 6. Does Bob violate \textbf{consider human factors}?
-& Select if yes \checkbox{Q3P6Y}{width=1.5em}{true}\\\\
+& Select if yes \checkbox{Q3P6Y}{width=1.5em}{
+%X
+}\\\\
 
 7. Does Bob violate \textbf{complete mediation}?
-& Select if yes \checkbox{Q3P7Y}{width=1.5em}{false}\\\\
+& Select if yes \checkbox{Q3P7Y}{width=1.5em}{
+X
+}\\\\
 
 8. Does Bob violate \textbf{detect if you can't protect}?
-& Select if yes \checkbox{Q3P8Y}{width=1.5em}{false}\\\\
+& Select if yes \checkbox{Q3P8Y}{width=1.5em}{
+X
+}\\\\
 
 9. Does Bob violate \textbf{design security in from the start}?
-& Select if yes \checkbox{Q3P9Y}{width=1.5em}{true}\\\\
+& Select if yes \checkbox{Q3P9Y}{width=1.5em}{
+%X
+}\\\\
 
 \end{tabular}
 \includesolution{sol3}
 
 
-\newpage
+%\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%QUESTION 4%%%%%%%%%
@@ -256,16 +272,16 @@ int main(int argc, char *argv[])
     \end{center}
     Given this information, describe in detail how an attacker would take advantage of the vulnerability.
     Also make sure to include the address that the attacker needs to over-write. (Maximum 5 sentences)\\
-\textfield{Q4P3}{3cm}{
+\textfield{Q4P3}{2.7cm}{
 %Your solution to Q4 part 3 here
     The most simple exploit is code injection. The attacker should input more than 12 characters (I can't determine the exact number because of memory alignment issue) and overwrite the function return address area. The address that the attacker need to overwrite is 0xbffff820. By the way, the attacker can printf any stack data as he want.
 }
   \item What would you change to fix the problem in part 1?\\
-\textfield{Q4P4}{0.5cm}{
+\textfield{Q4P4}{4cm}{
 %Your solution to Q4 part 4 here
-    Please use C++ std::getline rather than unsafe scanf. An example written by me is here: https://github.com/recolic/rlib/blob/3a442c6dd8661d45cfe7528112b93c42ffa5d591/stdio.hpp#L52
+    Please use C++ std::getline rather than unsafe scanf. An example written by me is here: \url{https://github.com/recolic/rlib/blob/3a442c6dd8661d45cfe7528112b93c42ffa5d591/stdio.hpp\#L52} \\
     
-    If I must figure out the implementation of std::getline, please read here: https://github.com/recolic/rlib/blob/3a442c6dd8661d45cfe7528112b93c42ffa5d591/sys/sio.hpp#L516
+        If I must figure out the implementation of std::getline, please read here: \url{https://github.com/recolic/rlib/blob/3a442c6dd8661d45cfe7528112b93c42ffa5d591/sys/sio.hpp\#L516}
 }
   \item Given the code as is, would stack canaries prevent exploitation of this vulnerability?\\
       Select if yes \checkbox{Q4P5Y}{}{
@@ -273,7 +289,7 @@ int main(int argc, char *argv[])
       %Alternatively, export and check the box using a pdf editor
       false}\\
     Why or why not?\\
-\textfield{Q4P5}{1cm}{
+\textfield{Q4P5}{2cm}{
 %Your solution to Q4 part 5 here
     Stack canaries can make the exploit harder, but it won't prevent the exploitation. The attacker can still printf data on stack. However, canaries are still very very useful to protect this program. I considered for some time and answer "no".
 }
@@ -319,15 +335,20 @@ void dectohex(uint32_t decimal, char* hex) {
 \item Please identify the \textbf{preconditions} that must hold true for the following code to be memory safe. In addition, the precondition must be as conservative as possible (e.g. \texttt{decimal} cannot be required to be solely zero). Justify why your given precondition cannot be any less strict.\\
 \textfield{Q5P1}{4.5cm}{
 %Your solution to Q5 part 1 here
-    Argument `hex` must be a valid pointer to a writable memory space, and its size must be at least 9 bytes. 
+    Argument `hex` must be a valid pointer to a writable memory space, and its size must be at least 9 bytes.  \\
 
     If my precondition is not true, one of the following thing happens: 1. The pointer hex is invalid. It will
-        write some random memory address or cause segmentation fault. 2. The buffer size is less than 9 bytes. Now
-        because 32bit unsigned integer has maximum value "0xffffffff", and we have k<=8. 
+        write some random memory address or cause segmentation fault. 2. The buffer size is less than 9 bytes.
+        Because 32bit unsigned integer has maximum value "0xffffffff", and we have k<=8. So buffer size must be 
+        at least 9 byte to avoid buffer overflow.
+
 }
 \item Please identify the loop \textbf{invariants} (b, c) that must hold true and justify them as well.\\
 \textfield{Q5P2}{4.5cm}{
 %Your solution to Q5 part 2 here
+    b: j>=0 \&\& j<=7 \\
+
+    c: j>=1 \&\& j<=8, k>=0 \&\& k<=7
 }
 \end{enumerate}
 \includesolution{sol5}
