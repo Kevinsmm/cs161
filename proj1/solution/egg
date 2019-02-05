@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./egg3 > /dev/null
+cat input.txt # | invoke dejavu
+
