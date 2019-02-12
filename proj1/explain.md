@@ -223,6 +223,11 @@ with open('/dev/fd/1','wb') as f:
 
 ## 4
 
+The solution is easy. Since BUFLEN=16, I send `0123456789ab\x`, then dehexify skips the `\0` and prints everything in canary area.
+
+Now I construct a message with 16 junk characters to fill the buffer, correct canary, another 8 characters to shift ebp & other staffes, and the return address, then the shellcode.
+
+
 ## 5
 
 - motivation
@@ -266,8 +271,22 @@ However, we need a fixed-address writable page to put `%ebp`. The page `0x080480
 
 Please see the image below. The procedure is too complicated to explain.
 
+![Please contact root@recolic.net if you can not view this image](https://dl.recolic.net/res/161-proj1-5.png)
 
+Because I have 40 bytes ahead for payload, I can put a shellcode to launch /bin/sh directly. But if I want to create tcp server, I have to write a simple payload and jmp to `&buf+68`. The simple payload is attached below.
 
+```
+// get current addr
+call foo
+foo:
+pop %eax
+
+// 40 + 4+4+4+4+4+4+4 - 5
+add $63, %eax
+jmp *%eax
+```
+
+I put 5 `nop` at `&buf+68` to make it work even if I have made a mistake.
 
 
 
