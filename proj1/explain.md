@@ -221,5 +221,53 @@ with open('/dev/fd/1','wb') as f:
 
 ```
 
+## 4
+
+## 5
+
+- motivation
+
+I noticed the following content in `objdump -d agent-jones`:
+
+```
+ 8048680:	89 c8                	mov    %ecx,%eax
+ 8048682:	89 45 0c             	mov    %eax,0xc(%ebp)
+ 8048685:	8b 45 08             	mov    0x8(%ebp),%eax
+ 8048688:	23 45 0c             	and    0xc(%ebp),%eax
+ 804868b:	5d                   	pop    %ebp
+ 804868c:	c3                   	ret    
+
+...
+
+08048930 <__do_global_ctors_aux>:
+ 8048930:	55                   	push   %ebp
+ 8048931:	89 e5                	mov    %esp,%ebp
+ 8048933:	53                   	push   %ebx
+ 8048934:	52                   	push   %edx
+ 8048935:	bb dc 9e 04 08       	mov    $0x8049edc,%ebx
+ 804893a:	8b 03                	mov    (%ebx),%eax
+ 804893c:	83 f8 ff             	cmp    $0xffffffff,%eax
+ 804893f:	74 07                	je     8048948 <__do_global_ctors_aux+0x18>
+ 8048941:	ff d0                	call   *%eax
+ 8048943:	83 eb 04             	sub    $0x4,%ebx
+ 8048946:	eb f2                	jmp    804893a <__do_global_ctors_aux+0xa>
+ 8048948:	58                   	pop    %eax
+ 8048949:	5b                   	pop    %ebx
+ 804894a:	5d                   	pop    %ebp
+ 804894b:	c3                   	ret    
+
+```
+
+I can set `%ebp` to any fixed address, then return to 0x08048680. Because `&buf` is in `%ecx`, then value of `0xc(%ebp)` will be `&&buf`. Then put `%ebp+0xc` (that's a fixed address) onto stack, return to `0x08048949`, and now we have `&&buf` in `%ebx`. Then return to `0x0804893a`, `(%ebx)` is sent to `%eax` and jumps to `&buf`, we win!
+
+However, we need a fixed-address writable page to put `%ebp`. The page `0x08048000 - 0x08049000` is not writable. I'm so lucky that the page starts at `0x0804a000` works! So I set the "fixed address" to `0x0804a790`.
+
+- implementation
+
+Please see the image below. The procedure is too complicated to explain.
+
+
+
+
 
 
