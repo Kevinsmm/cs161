@@ -2,8 +2,11 @@
 if [[ $1 == remote ]]; then
     echo 'Connecting ucb cs161 autograde machine...'
     u=atw
-    echo ssh -t cs161-$u@hive$((36#${u:2}%26+1)).cs.berkeley.edu \~cs161/proj1/start
-    ssh -t cs161-$u@hive$((36#${u:2}%26+1)).cs.berkeley.edu \~cs161/proj1/start
+    ssh -t cs161-$u@hive1.cs.berkeley.edu \~cs161/proj1/start
+elif [[ $1 == make-submit ]]; then
+    echo 'Pull solution from ucb cs161 autograde machine...'
+    u=atw
+    ssh cs161-$u@hive1.cs.berkeley.edu \~cs161/proj1/make-submission > proj1-subm.zip
 else
     echo 'Connecting localhost...'
     #sshpass -p r4e8kWpeFC ssh -o PreferredAuthentications=password -o PubkeyAuthentication=no  vsftpd@localhost -p 16161
