@@ -1,0 +1,451 @@
+\documentclass[12pt]{exam}
+\usepackage[homework,id=2]{cs161}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{pdfpages}
+\usepackage{seqsplit}
+
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{subfiles}
+\usepackage{etoolbox}
+
+\lstset{
+language=C,                % choose the language of the code
+basicstyle=\scriptsize,       % the size of the fonts that are used for the code
+numbers=left,                   % where to put the line-numbers
+numberstyle=\scriptsize,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+frame=single,           % adds a frame around the code
+tabsize=2,          % sets default tabsize to 2 spaces
+captionpos=b,           % sets the caption-position to bottom
+breaklines=true,        % sets automatic line breaking
+breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
+
+\DeclareMathOperator\Enc{Enc}
+
+\newcommand{\solbox}[2]{%
+\fbox{%
+\parbox[c][#1][t]{\dimexpr\linewidth-2\fboxsep-2\fboxrule}{
+  \hrule width \hsize height 0pt
+  #2
+ }%
+}%
+\par\vspace{\ht\strutbox}
+}
+\makeatother
+
+\usepackage{etoolbox}
+\newtoggle{pdfform}
+\togglefalse{pdfform} % may be toggled true in configuration
+
+\InputIfFileExists{config}{}
+
+\newcommand{\textfield}[3]{%
+\iftoggle{pdfform}{%
+\TextField[name = #1, backgroundcolor=white, height=#2,
+width = \linewidth, multiline=true]{\mbox}%
+}{%
+\ifprintanswers\else{%
+    \solbox{#2}{#3}}
+\fi%
+}%
+}
+
+\newcommand{\includesolution}[1]{%
+\IfFileExists{solutions/#1.tex}{%
+\begin{solution}%
+\subfile{solutions/#1.tex}%
+\end{solution}%
+}{}
+}
+
+
+
+\newcommand{\checkbox}[3]{%
+\iftoggle{pdfform}{%
+\CheckBox[name = #1, backgroundcolor=white, bordercolor=black, #2]{}%
+}{%
+\ifprintanswers\else%
+\framebox[0.6cm]{\rule{0pt}{0.4cm}#3}
+\fi%
+}%
+}
+
+\def\duedate{Sunday, 17 February 2019}
+
+\begin{document}
+\begin{Form}
+
+\begin{center}
+  \large
+  Due: \duedate, at 11:59pm
+\end{center}
+
+\paragraph{Instructions.}
+This homework is due \textbf{\duedate, at 11:59pm}. No late homeworks will be accepted unless you have prior accomodations from us.
+This assignment must be done on your own.
+
+Create an EECS instructional class account if you have not already. To do so,
+visit \url{https://inst.eecs.berkeley.edu/webacct/}, click ``Login
+using your Berkeley CalNet ID,'' then find the cs161 row and click ``Get a new
+account.'' Be sure to take note of the account login and password, and log in to
+your instructional account.
+
+Make sure you have a Gradescope account and are joined in this course.  The
+homework \emph{must} be submitted electronically via Gradescope (not by
+any other method).  Your answer for each question,
+when submitted on Gradescope, should be written in the space provided on this PDF form. You may either use the LaTeX form provided to fill out your responses, use Adobe Acrobat to fill in this fillable PDF, or print this paper out and handwrite your solutions, but \textbf{please make sure your responses do not overflow the box provided before submitting to ensure that you get full credit for your response.}
+
+\begin{questions}
+
+\newpage
+\titledquestion{True-or-False Questions}[45]
+Answer each question.
+You don't need to justify or explain your answer.
+
+\begin{parts}
+
+\part Select if true \checkbox{Q1P1Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+X
+}: The Diffie-Hellman key exchange protocol protects
+against eavesdroppers but is vulnerable to man-in-the-middle attacks.
+
+\part Select if true \checkbox{Q1P2Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: Suppose there is a transmission error in a block $B$ of ciphertext using CBC mode.  This error propagates to every block in decryption, which means that the block $B$ and every block after $B$ cannot be decrypted correctly.
+
+\part Select if true \checkbox{Q1P3Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: The IV for CBC mode must be kept secret.
+
+\part Select if true \checkbox{Q1P4Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: The random number $r$ in El
+    Gamal must be kept secret.
+
+\part Select if true \checkbox{Q1P5Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: The best way to be confident
+    in the cryptography that you use is to write your own
+    implementation.
+
+\part Select if true \checkbox{Q1P6Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: \textbf{(OPTIONAL)} Alice and Bob share a symmetric key $k$. Alice sends
+Bob a message encrypted with $k$ stating, ``I owe you \$100'',
+using AES-CBC encryption. Assuming AES is secure,
+we can be confident that an active attacker cannot tamper with this message;
+its integrity is protected.
+
+\part Select if true \checkbox{Q1P7Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: If the daily lottery numbers
+    are truly random, then they can be used as the entropy for a
+    one-time-pad since a one-time-pad needs to be random.
+
+\part Select if true \checkbox{Q1P8Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+X
+}: It is okay if multiple people
+perform El Gamal encryption with the same modulus $p$.
+
+\part Select if true \checkbox{Q1P9Y}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}: \textbf{(OPTIONAL)} Alice and Bob share a secret symmetric key $k$ which they use for
+calculating MACs. Alice sends the message $M = $``I, Alice, owe you, Bob, \$100'' to Bob along with its message authentication code
+$\text{MAC}_k(M)$. Bob can present $(M, \text{MAC}_k(M))$ to a judge
+as proof that Alice owes him \$100 since a MAC provides integrity.
+
+\end{parts}
+
+\newpage
+% Yes this is just CFB mode...
+\titledquestion{New Block Cipher Mode}[35]
+
+Nick decides to invent a new block cipher mode, called NBC. It is
+defined as follows:
+
+$$ C_i = E_k(C_{i-1}) \oplus P_i $$
+$$ C_0 = \text{IV} $$
+
+Here $(P_1, \ldots, P_n)$ is the plaintext message, $E_k$ is block
+cipher encryption with key $k$.
+
+\begin{parts}
+
+\part Given $(C_0, C_1, \ldots, C_n)$ and the key $k$, explain how to
+    recover the original message $(P_1, \ldots, P_n)$.
+    \\ \\ \textfield{Q2P1}{4cm}{
+%Your solution to Q2 part 1 here
+}
+
+\part Is NBC encryption parallelizable? How about decryption? Provide a 
+short justification for each.
+\\ \\ \textfield{Q2P2}{4cm}{
+%Your solution to Q2 part 2 here
+}
+
+\part As we saw in discussion, CBC mode is vulnerable to a chosen plaintext
+attack when the IV which will be used to encrypt the message is known in 
+advance. Is NBC vulnerable to the same issue?
+\\ \\ \textfield{Q2P3}{4cm}{
+%Your solution to Q2 part 3 here
+}
+
+\part Say that Alice means to send the message $(P_1, \ldots, P_n)$ to Bob using
+NBC mode. By accident, Alice typos and encrypts $(P_1 \oplus 1, \ldots,
+    P_n)$ instead (i.e., she accidentally flips the last bit of the
+    first block).
+    
+\textsc{True} or \textsc{False}: after Bob decrypts the resulting
+    ciphertext, every block after the first is incorrect. Explain
+    your answer.
+    \\ \\ \textfield{Q2P4}{4cm}{
+%Your solution to Q2 part 4 here
+}
+
+\part Alice encrypts the message $(P_1, \ldots, P_5)$.
+    Unfortunately, the block $C_3$ of the ciphertext is lost in
+    transmission, so that Bob recieves $(C_0, C_1, C_2, C_4, C_5)$.
+    Assuming that Bob knows that he is missing $C_3$, which blocks of
+    the original plaintext can Bob recover?
+    
+Select if the block is recoverable: $P_1$ \checkbox{Q2P5aY}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+$P_2$ \checkbox{Q2P5bY}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+$P_3$ \checkbox{Q2P5cY}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+$P_4$ \checkbox{Q2P5dY}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+$P_5$ \checkbox{Q2P5eY}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+
+\end{parts}
+
+\newpage
+\titledquestion{Hashing Functions}[15]
+
+Recall the definition of ``one-way functions'' and
+``collision-resistance'' from lecture. We say a function $f$ is
+one-way if given $f(x)$ it is hard to find $x'$ such that $f(x') =
+f(x)$. Likewise, we say a function $f$ is ``collision-resistant'' if
+it is hard to find two inputs $x, y$ such that $f(x) = f(y)$ but
+$x\neq y$. For each of the given functions $H$ below, determine if it
+is one-way or not, and if it is collision-resistant or not. (State
+any assumptions that you make in the margin.)
+
+\begin{parts}
+
+\part Select if $H(x) = x$ is: One-way \checkbox{Q3a1}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+} Collision-resistant \checkbox{Q3a2}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+
+\part Select if $H(x) = x \bmod 2$ is: One-way \checkbox{Q3b1}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+} Collision-resistant \checkbox{Q3b2}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}
+
+\part Select if $H(x) = E_k(x)$ is: One-way \checkbox{Q3c1}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+} Collision-resistant \checkbox{Q3c2}{width=1.5em}{
+%Yes/No directions: uncomment 'X' to make it appear
+%X
+}, where $E_k$ is a ideally secure block cipher with a known and published key $k$.
+
+\end{parts}
+
+\newpage
+\titledquestion{Finding Common Patients}[40]
+
+Caltopia has two hospitals: Bear Hospital and Tree Hospital, each of which has
+a database of patient medical records that contain highly sensitive, confidential patient information.
+For both hospitals, each medical record is a tuple $(p_i, m_i)$, where
+$p_i$ and $m_i$ are strings that correspond to the patient's full name and
+medical record respectively;
+assume that every person in Caltopia has a unique full name.
+Thus, we can think of Bear Hospital's patient database as a list of tuples
+$(x_1, m_1), (x_2, m_2),...,(x_n, m_n)$, where $m_i$ is the medical information
+that Bear Hospital has for patient $x_i$.
+Similarly, we can think of
+Tree Hospital's database as a list $(y_1, m'_1), (y_2, m'_2),...,(y_m, m'_m)$,
+where $m'_i$ is a string that encodes the medical information that Tree Hospital
+has for the patient named $y_i$. Note that for a given patient, Tree Hospital
+and Bear Hospital might have different medical information.
+
+The two hospitals want to collaborate on a way to identify which Caltopia
+citizens are patients at both hospitals.
+However, due to privacy laws, the two hospitals cannot share any
+plaintext information about patients (including their names) unless both
+hospitals know \emph{a priori} that a patient has used both hospitals.
+
+Thus, the two hospitals decide to build a system that will allow them to
+identify common patients of both hospitals.
+They enlist the help of Lady Olenna, who provides them with a trusted,
+third-party server $S$, which they will use to discover the names of patients
+who use both hospitals.
+Specifically, Bear Hospital will take some information from its patient
+database and transform it into a list $(x^*_1), (x^*_2),..., (x^*_n)$ (where
+$(x^*_i)$ is somehow derived from $x_i$ (the patient's full name) and upload it to $S$.
+Similarly, Tree Hospital will take information from its patient database,
+transform it into a list $(y^*_1), (y^*_2),..., (y^*_m)$, and upload this
+transformed list to $S$.
+Finally, $S$ will compute a set of tuples $P = {(i, j) : x_i = y_j}$ of all
+pairs $(i, j)$ such that $x^*_i = y^*_j$ and send $P$ to both Bear Hospital and
+Tree Hospital.
+The two hospitals can then take their respective indices from the tuples in $P$
+to identify patients who use both hospitals.
+
+We want to ensure three requirements with the above scheme:
+(1) if $x_i=y_j$, then $(i,j) \in P$,
+(2) if $x_i\ne y_j$, then it is very unlikely that $(i,j) \in P$,
+(3) even if Eve (an attacker) compromises $S$, she cannot learn the name of any
+patient at either hospital or the medical information for any patient.
+For this question, assume that Eve is a passive
+attacker who cannot conduct Chosen Plaintext Attacks; however, she does know the
+names of everyone in Caltopia, and there are citizens whose full names are
+a unique length.
+
+Your solution can use the cryptographic hash SHA-256
+and/or AES with one of the three block cipher encryption modes discussed in
+class; keep in mind that Eve can also compute SHA-256 hashes and use AES with
+any block cipher mode.
+You can assume that Bear Hospital and Tree Hospital share a key $k$
+that is not known to anyone else.
+You \emph{cannot} use public-key cryptography or modular arithmetic.
+
+\begin{parts}
+\part In the collaboration scheme described above, how should Bear Hospital
+compute $x^*_i$ (as a function of $x_i$)?
+How should Tree Hospital compute $y^*_i$ (as a function of $y_i$)?
+Specifically, your solution should define a function $F$ that Bear Hospital
+will use to transform $x_i$ into $x^*_i$, and if relevant, a function
+$G$ that Tree Hospital will use to transform $y_i$ into $y^*_i$.
+
+\textfield{Q4P1}{4cm}{
+%Your solution to Q4 part 1 here
+}
+
+\part Explain why requirement (1) is met by your solution,
+i.e., explain why it is guaranteed that if $x_i=y_j$, then
+$x^*_i=y^*_j$ will hold. Explain your answer in one or two sentences.
+
+\textfield{Q4P2}{2cm}{
+%Your solution to Q4 part 2 here
+}
+
+\part Explain why requirement (2) is met by your solution,
+i.e., if $x_i\ne y_j$, explain why it is unlikely that $x^*_i=y^*_j$.
+Explain your answer in one or two sentences.
+
+\textfield{Q4P3}{2cm}{
+%Your solution to Q4 part 3 here
+}
+
+\part Explain why requirement (3) is met by your solution,
+i.e., if $S$ is compromised by Eve, then the information known
+to $S$ does not let Eve learn any patient information (neither the names of
+patients at a particular hospital nor the medical history for any patient).
+Explain your answer in one or two sentences.
+
+\textfield{Q4P4}{2cm}{
+%Your solution to Q4 part 4 here
+}
+
+\end{parts}
+
+\newpage
+\titledquestion{El Gamal Encryption}[30]
+
+Recall the definition of El Gamal encryption from lecture. Bob publishes a
+large prime $p$, and an integer $g$ with $1 < g < p - 1$. To generate a key,
+Bob chooses a random value $0 \le b \le p - 2$, and computes $B = g^b \bmod p$.
+Bob's public key is $B$, and his private key is $b$. If Alice wants to send a
+message $m$ to Bob, she begins by generating a random $r$ such that $0 \le r
+\le p - 2$, and creates the ciphertext $(c_1, c_2) = (g^r \bmod p, m \cdot B^r
+\bmod p)$. To decrypt the ciphertext, Bob calculates $c_1^{-b} c_2 \equiv m
+\pmod{p}$.
+
+Note: As mentioned in the notes, this simplified El Gamal scheme is actually not semantically secure.
+
+\begin{parts}
+
+\part Suppose you intercept a ciphertext $(c_1, c_2)$ that Alice has encrypted
+for Bob, which is the encryption for some message $m$. Construct a ciphertext $(c_1', c_2')$ which is the encryption of $2m$. \textbf{Answer Format: ($\rule{1cm}{0.15mm}$, $\rule{1cm}{0.15mm}$)}
+
+\textfield{Q5P1}{1cm}{
+%Your solution to Q5 part 1 here
+}
+
+\part Suppose you intercept two ciphertexts $(c_1, c_2)$ and $(c_1', c_2')$
+that Alice has encrypted for Bob. Assume they are encryptions of some
+unknown messages $m_1$ and $m_2$. Construct a ciphertext $(c_1'', c_2'')$
+which is a valid El Gamal encryption of the message $m_1 \cdot m_2 \bmod p$. \textbf{Answer Format: ($\rule{1cm}{0.15mm}$, $\rule{1cm}{0.15mm}$)}
+
+\textfield{Q5P2}{1cm}{
+%Your solution to Q5 part 2 here
+}
+
+\part Consider a new scheme where the value $r$ is not generated
+    randomly every time. Instead, Alice begins by randomly generating
+    an initial value $r_0$, and then simply incrementing $r_0$ by $1$
+    every time she needs to encrypt another message. Is the resulting
+    encryption scheme IND-CPA?
+
+\textfield{Q5P3}{5cm}{
+%Your solution to Q4 part 3 here
+}
+
+\end{parts}
+
+\newpage
+% Yes this is just CFB mode...
+\titledquestion{Feedback}[0]
+
+Optionally, feel free to include feedback. What'€™s the single thing we could do to make
+the class better? Or, what did you find most difficult or confusing from lectures or the
+rest of class, and what would you like to see explained better? If you have feedback,
+submit your comments as your answer to Q6.
+
+\textfield{Q5P3}{5cm}{
+%Your solution to Q4 part 1 here
+}
+
+\end{questions}
+\end{Form}
+\end{document}
+
