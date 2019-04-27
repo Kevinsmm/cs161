@@ -1,0 +1,92 @@
+
+
+- <script> in post: xss
+
+post_xss.har -> test 2
+
+
+
+- unauthorized post : sql injection
+
+curl 'http://127.0.0.1:5000/post' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'Origin: http://127.0.0.1:5000' -H 'Cookie: SESSION_ID=FUCKYOU\' OR username=\'xoxogg' --data 'post=fake post <script>alert("Yourmothersuck. Fuckyou")</script>'
+
+js console: (to get har)
+document.cookie = 'SESSION_ID=FUCKYOU\' OR username=\'xoxogg'
+
+cookie_sql_inj.har -> test5
+
+- final write up
+
+weaponize:
+
+Just make a post with cookie="SESSION_ID=NOTHING' OR username='dirks". If dirks is online, it will work.
+
+Vulnerability writeup:
+
+    - Test1:
+        - How it works:
+
+        Just craft a link: http://127.0.0.1:5000/wall/%3Csvg%20onload=alert(1)%3E
+        The page will show: `No wall for <svg onload=alert(1)>!`
+
+        - The line of code:
+
+        server.py line 129
+
+        - The impact:
+
+        If the victim clicked this link, it will run some crafted javascript on Snapitterbook, with the victim's cookie.
+        For example, the js can create a post, delete a avatar, and do anything with the victim's cookie.
+
+        - How to fix:
+        
+        Just apply this patch: server.py.patch
+```
+129c129,130
+<         return render_template('no_wall.html', username=other_username)
+---
+>         good_username = re.sub(r'\W+', '', other_username)
+>         return render_template('no_wall.html', username=good_username)
+```
+
+        - How to avoid this problem in general:
+    
+        verify the input before showing any user-input directly onto the webpage.
+
+    - Test5:
+        - How it works:
+
+        The server inserts the cookie directly into the SQL instruction. So there's a sql injection problem.
+        If we use the cookie `SESSION_ID=NOTHING' OR username='dirks`, then the SQL instruction looks like:
+
+        SELECT username FROM sessions WHERE id='NOTHING' OR username='dirks';
+
+        Then it returns `dirks`, then the post as dirks is allowed.
+
+        - The line of code:
+
+        ./auth_helper.py line 21
+
+        - The impact:
+
+        If the victim is online (or just forgot to logout), then he has a `SESSION & username` pair in the database.
+        Then anyone can send a post into his wall.
+    
+        - How to fix:
+        
+        Just apply this patch: auth_helper.py.patch
+```
+21c21,22
+<     found_session = database.fetchone("SELECT username FROM sessions WHERE id='{}';".format(session))
+---
+>     good_session = re.sub(r'\W+', '', session)
+>     found_session = database.fetchone("SELECT username FROM sessions WHERE id='{}';".format(good_session))
+```
+
+        - How to avoid this problem in general:
+    
+        verify the input before crafting any SQL instruction.
+
+        
+
+

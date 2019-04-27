@@ -1,0 +1,8 @@
+*** /dev/null
+--- /dev/null
+***************
+*** 129,130
+-         good_username = re.sub(r'\W+', '', other_username)
+-         return render_template('no_wall.html', username=good_username)
+--- 129 -----
++         return render_template('no_wall.html', username=other_username)

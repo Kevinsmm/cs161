@@ -1,0 +1,6 @@
+129c129,130
+<         return render_template('no_wall.html', username=other_username)
+---
+>         good_username = re.sub(r'\W+', '', other_username)
+>         return render_template('no_wall.html', username=good_username)
+
